@@ -25,7 +25,7 @@ if ($res_hotels->num_rows > 0) {
     while ($row2 = $res_hotels->fetch_array(MYSQLI_ASSOC)) {
         $hotel_body .= "<div class='col-12 colmd-6 col-lg-3'>
         <div class='card' style='width: 18rem;'>
-            <img src='pictures/" . $row2['picture'] . "' class='card-img-top' alt='Error'>
+            <img src='../pictures/" . $row2['picture'] . "' class='card-img-top' alt='Error'>
             <div class='card-body'>
                 <h5 class='card-title'>" . $row2['hotel_name'] . "</h5>
                 <p class='card-text'>" . $row2['address'] . "</p>
@@ -36,16 +36,45 @@ if ($res_hotels->num_rows > 0) {
         $hotel_opt .= "<option value='{$row2['hotel_id']}'>{$row2['hotel_name']}</option>";
     }
 }
+$booking_bd = '';
+$sql6 = "SELECT * FROM bookings JOIN hotels ON bookings.fk_hotel_id=hotels.hotel_id WHERE fk_u_id=$id;";
+$booking_bd = '';
+$res6 = mysqli_query($connect, $sql6);
+if ($res6->num_rows > 0) {
+    while ($row6 = $res6->fetch_array(MYSQLI_ASSOC)) {
+        $booking_bd .= "<div class='col-12 colmd-6 col-lg-3'>
+         <div class='card' style='width: 18rem;'>
+             <img src='../pictures/" . $row6['picture'] . "' class='card-img-top' alt='Error'>
+             <div class='card-body'>
+                 <h5 class='card-title'>" . $row6['hotel_name'] . "</h5>
+                 <p class='card-text'> Room " . $row6['room'] . "</p>
+                 <h6>Price per night: " . $row6['price'] . " Euros</h6>
+             </div>
+         </div>
+     </div>";
+    }
+}
 $message = '';
 if ($_POST) {
     $hotel = $_POST['hotels'];
     $customer = $_POST['id'];
     $room = $_POST['room'];
-    $sql3 = "INSERT INTO `bookings` (`book_id`, `fk_hotel_id`, `fk_u_id`, `room`) VALUES (NULL, '$hotel', '$customer', '$room')";
-    if (mysqli_query($connect, $sql3) === TRUE) {
-        $message = "Success!";
+    $sql4 = "SELECT * FROM hotels WHERE hotel_id=$hotel";
+    $res4 = mysqli_query($connect, $sql4);
+    $row4 = mysqli_fetch_array($res4, MYSQLI_ASSOC);
+    $sql5 = "SELECT * FROM bookings WHERE fk_hotel_id=" . $hotel . " AND room=" . $room;
+    $res5 = mysqli_query($connect, $sql5);
+    if ($room > $row4['roomnumb']) {
+        $message = "The maximal number of rooms of this hotel is " . $row4['roomnumb'] . ".";
+    } elseif ($res5->num_rows > 0) {
+        $message = "This room is already booked.";
     } else {
-        $message = "Error";
+        $sql3 = "INSERT INTO `bookings` (`book_id`, `fk_hotel_id`, `fk_u_id`, `room`) VALUES (NULL, '$hotel', '$customer', '$room')";
+        if (mysqli_query($connect, $sql3) === TRUE) {
+            $message = "You have booked the room!";
+        } else {
+            $message = "Connection error.";
+        }
     }
 }
 mysqli_close($connect);
@@ -83,6 +112,7 @@ mysqli_close($connect);
         <h2 class="text-center">Hotels</h2>
         <div class="row"><?= $hotel_body ?></div>
         <hr>
+        <h4 class="text-center"><?= $message ?></h4>
         <legend class='h2'>Choose a Hotel</legend>
         <form action="home.php" method="post" enctype="multipart/form-data">
             <table class='table'>
@@ -106,7 +136,11 @@ mysqli_close($connect);
                 </tr>
             </table>
         </form>
-        <h4 class="text-center"><?= $message ?></h4>
+        <div class="row">
+            <h2>Your bookings</h2>
+            <?= $booking_bd ?>
+        </div>
+
     </div>
 
 </body>
