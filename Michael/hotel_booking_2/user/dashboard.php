@@ -39,7 +39,7 @@ if (isset($_GET['user'])) {
 }
 if (isset($_GET['bookings'])) {
     $disp_book = 'initial';
-    $sql2 = "SELECT hotel_name, f_name, s_name, room from user join bookings ON user.u_id=bookings.fk_u_id JOIN hotels on bookings.fk_hotel_id=hotels.hotel_id;";
+    $sql2 = "SELECT book_id,hotel_name, f_name, s_name, room from user join bookings ON user.u_id=bookings.fk_u_id JOIN hotels on bookings.fk_hotel_id=hotels.hotel_id;";
     $result2 = mysqli_query($connect, $sql2);
     $booking = '';
     if ($result2->num_rows > 0) {
@@ -49,8 +49,8 @@ if (isset($_GET['bookings'])) {
            <td>" . $row2['f_name'] . " " . $row2['s_name'] . "</td>
            
            <td>" . $row2['room'] . "</td>
-           <td><a href='update.php'><button class='btn btn-primary btn-sm' type='button'>Edit</button></a>
-           <a href='delete.php'><button class='btn btn-danger btn-sm' type='button'>Delete</button></a></td>
+           <td><a href='../bookings/update.php?id=" . $row2['book_id'] . "'><button class='btn btn-primary btn-sm' type='button'>Edit</button></a>
+           <a href='../bookings/delete.php?id=" . $row2['book_id'] . "'><button class='btn btn-danger btn-sm' type='button'>Delete</button></a></td>
         </tr>"; //for delete or edit insert $row2['hotel_id'] after ?id= in the links!
         }
     } else {
@@ -69,8 +69,9 @@ if (isset($_GET['hotels'])) {
            <td>" . $row3['hotel_name'] . "</td>
            <td>" . $row3['address'] . "</td>
            <td>" . $row3['price'] . "</td>
-           <td><a href='update.php'><button class='btn btn-primary btn-sm' type='button'>Edit</button></a>
-           <a href='delete.php'><button class='btn btn-danger btn-sm' type='button'>Delete</button></a></td>
+           <td>" . $row3['roomnumb'] . "</td>
+           <td><a href='../hotels/update.php?id=" . $row3['hotel_id'] . "'><button class='btn btn-primary btn-sm' type='button'>Edit</button></a>
+           <a href='../hotels/delete.php?id=" . $row3['hotel_id'] . "'><button class='btn btn-danger btn-sm' type='button'>Delete</button></a></td>
         </tr>";
         }
     } else {
@@ -157,6 +158,7 @@ if (isset($_GET['hotels'])) {
                 <?= $booking ?>
             </tbody>
         </table>
+        <a href="../bookings/create.php" class="btn btn-info">Add Booking</a>
     </div>
     <div class="container" style='display: <?= $disp_hotel ?> ;'>
         <h2>Hotels</h2>
@@ -167,6 +169,7 @@ if (isset($_GET['hotels'])) {
                     <th>Name</th>
                     <th>Address</th>
                     <th>Price per Night</th>
+                    <th>Number of rooms</th>
                 </tr>
             </thead>
             <tbody>

@@ -3,12 +3,12 @@ session_start();
 require_once '../components/db_connect.php';
 // if session is not set this will redirect to login page
 if (!isset($_SESSION['adm']) && !isset($_SESSION['user'])) {
-    header("Location: login.php");
+    header("Location: ../user/login.php");
     exit;
 }
 //if session user exist it shouldn't access dashboard.php
 if (isset($_SESSION["user"])) {
-    header("Location: home.php");
+    header("Location: ../user/home.php");
     exit;
 }
 require_once '../components/db_connect.php';
